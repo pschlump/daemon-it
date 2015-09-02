@@ -65,9 +65,9 @@ Now let's create some devices that programs will need.
 ``` bash
 
 	$ cd ${D}/dev
- 	$ sudu /bin/mknod -m 0666 ${J}/dev/null c 1 3
-	$ sudu /bin/mknod -m 0666 ${J}/dev/random c 1 8
-	$ sudu /bin/mknod -m 0444 ${J}/dev/urandom c 1 9
+ 	$ sudo /bin/mknod -m 0666 ${D}/dev/null c 1 3
+	$ sudo /bin/mknod -m 0666 ${D}/dev/random c 1 8
+	$ sudo /bin/mknod -m 0444 ${D}/dev/urandom c 1 9
 
 ```
 
@@ -76,7 +76,7 @@ Now the account that the program will run under.
 ``` bash
 
 	$ sudo groupadd emailrelay
-	$ sudo useradd -m -s /bin/bash -d /home/jail/home/emailrelay -g emailrelay emailrelay
+	$ sudo useradd -m -s /bin/false -d ${D}/home/emailrelay -g emailrelay emailrelay
 
 ```
 
@@ -86,7 +86,7 @@ Now the directory where the executable will be.
 
 	$ cd ~emailrelay
 	$ sudo mkdir -p Projects/email-relay/log
-	$ chown -R emailrelay:emailrelay *
+	$ sudo chown -R emailrelay:emailrelay *
 
 ```
 
@@ -270,5 +270,9 @@ And make them executable and run them.
 	$ ./email-runner start
 
 ```
+
+### As a script
+
+The createion of the jail is in a single script in ./example called create-jail.sh
 
 
