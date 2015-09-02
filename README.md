@@ -143,6 +143,15 @@ My chroot jail should be ready to run.
 
 This is the time to add any configuration files that the program needs.
 
+Also you may need to allow the non-root program to access low ports.
+To do this:
+
+``` bash
+
+	$ sudo setcap 'cap_net_bind_service=+ep' email-relay
+
+```
+
 ### Setup the program to run as a daemon
 
 First copy in daemon-it into a executable directory on the server.
