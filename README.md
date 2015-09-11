@@ -171,72 +171,72 @@ I called this file email-runner.sh
 
 ``` bash
 
-#!/bin/sh
-#
-# email-runner   startup script for the email runner
-# processname:       email-runner
-# config:            ~/email-runner.cfg
-# pidfile:           /var/run/email-runner.pid
-# chkconfig: 2345 99 01
-# description:       the daemon for the email runner.
+	#!/bin/sh
+	#
+	# email-runner   startup script for the email runner
+	# processname:       email-runner
+	# config:            ~/email-runner.cfg
+	# pidfile:           /var/run/email-runner.pid
+	# chkconfig: 2345 99 01
+	# description:       the daemon for the email runner.
 
-# Source function library.
-. /etc/rc.d/init.d/functions
+	# Source function library.
+	. /etc/rc.d/init.d/functions
 
-PATH=/sbin:/usr/sbin:/bin:/usr/bin
-DESC="Email Runner"
-NAME=email-runner
-RUN_DIR=/home/emailrunner/Project/email-runner
-DAEMON=$RUN_DIR/$NAME
-DAEMON_IT=/usr/local/bin/daemon-it
-DAEMON_ARGS="--dir=. --port=80"
-DAEMON_USER=emailrunner
-DAEMON_GROUP=emailrunner
-PIDFILE=/var/run/$NAME.pid
+	PATH=/sbin:/usr/sbin:/bin:/usr/bin
+	DESC="Email Runner"
+	NAME=email-runner
+	RUN_DIR=/home/emailrunner/Project/email-runner
+	DAEMON=$RUN_DIR/$NAME
+	DAEMON_IT=/usr/local/bin/daemon-it
+	DAEMON_ARGS="--dir=. --port=80"
+	DAEMON_USER=emailrunner
+	DAEMON_GROUP=emailrunner
+	PIDFILE=/var/run/$NAME.pid
 
-# Exit if the package is not installed
-[ -x "$DAEMON" ] || exit 0
-[ -x "$DAEMON_IT" ] || exit 0
-mkdir -p "$RUN_DIR"/log
+	# Exit if the package is not installed
+	[ -x "$DAEMON" ] || exit 0
+	[ -x "$DAEMON_IT" ] || exit 0
+	mkdir -p "$RUN_DIR"/log
 
-# Read configuration variable file if it is present
-[ -r /etc/sysconfig/email-runner/$NAME ] && . /etc/sysconfig/email-runner/$NAME
+	# Read configuration variable file if it is present
+	[ -r /etc/sysconfig/email-runner/$NAME ] && . /etc/sysconfig/email-runner/$NAME
 
-start() {
-        echo -n $"Starting $NAME: "
-        rm -f "$PIDFILE"
-        $DAEMON_IT -R /home/jail -c "$RUN_DIR" -u "$DAERMON_USER" -g "$DAERMON_GROUP" -o log/output.log -O - -p "$PIDFILE" \
-			-- $DAEMON $DAEMON_ARGS &
-        RETVAL="$?"
-        return "$RETVAL"
-}
-stop() {
-        echo -n $"Stopping $NAME: "
-        killproc -p "$PIDFILE" -d 10 "$DAEMON"
-        RETVAL="$?"
-        echo
-        [ $RETVAL = 0 ] && rm -f "$PIDFILE"
-        return "$RETVAL"
-}
+	start() {
+			echo -n $"Starting $NAME: "
+			rm -f "$PIDFILE"
+			$DAEMON_IT -R /home/jail -c "$RUN_DIR" -u "$DAERMON_USER" -g "$DAERMON_GROUP" -o log/output.log -O - -p "$PIDFILE" \
+				-- $DAEMON $DAEMON_ARGS &
+			RETVAL="$?"
+			return "$RETVAL"
+	}
+	stop() {
+			echo -n $"Stopping $NAME: "
+			killproc -p "$PIDFILE" -d 10 "$DAEMON"
+			RETVAL="$?"
+			echo
+			[ $RETVAL = 0 ] && rm -f "$PIDFILE"
+			return "$RETVAL"
+	}
 
-case "$1" in
-  start)
-        start
-        ;;
-  stop)
-        stop
-        ;;
-  restart|reload)
-        stop
-        start
-        ;;
-  *)
-        echo "Usage: $NAME {start|stop|restart|reload}" >&2
-        exit 1
-        ;;
-esac
+	case "$1" in
+	  start)
+			start
+			;;
+	  stop)
+			stop
+			;;
+	  restart|reload)
+			stop
+			start
+			;;
+	  *)
+			echo "Usage: $NAME {start|stop|restart|reload}" >&2
+			exit 1
+			;;
+	esac
 
-exit $RETVAL
+	exit $RETVAL
 
 ```
 
@@ -246,25 +246,24 @@ Now a script, I called install.sh to setup the /etc/inid.d stuff.
 
 ``` bash
 
+	#!/bin/bash
 
-#!/bin/bash
+	if [ "$(whoami)" == "root" ] ; then
+		:
+	else
+		echo "Usage: !! run as root"
+		exit 1
+	fi
 
-if [ "$(whoami)" == "root" ] ; then
-	:
-else
-	echo "Usage: !! run as root"
-	exit 1
-fi
-
-cp email-runner.sh /etc/init.d/tab-server
-cd /etc
-ln -s /etc/init.d/tab-server ./rc0.d/K98tab-server
-ln -s /etc/init.d/tab-server ./rc1.d/K98tab-server
-ln -s /etc/init.d/tab-server ./rc2.d/S98tab-server
-ln -s /etc/init.d/tab-server ./rc3.d/S98tab-server
-ln -s /etc/init.d/tab-server ./rc4.d/S98tab-server
-ln -s /etc/init.d/tab-server ./rc5.d/S98tab-server
-ln -s /etc/init.d/tab-server ./rc6.d/K98tab-server
+	cp email-runner.sh /etc/init.d/tab-server
+	cd /etc
+	ln -s /etc/init.d/tab-server ./rc0.d/K98tab-server
+	ln -s /etc/init.d/tab-server ./rc1.d/K98tab-server
+	ln -s /etc/init.d/tab-server ./rc2.d/S98tab-server
+	ln -s /etc/init.d/tab-server ./rc3.d/S98tab-server
+	ln -s /etc/init.d/tab-server ./rc4.d/S98tab-server
+	ln -s /etc/init.d/tab-server ./rc5.d/S98tab-server
+	ln -s /etc/init.d/tab-server ./rc6.d/K98tab-server
 
 
 ```
@@ -284,4 +283,29 @@ And make them executable and run them.
 
 The createion of the jail is in a single script in ./example called create-jail.sh
 
+
+### The files that I had to add to get this to work
+
+First off in /etc in the jail
+
+```
+
+	host.conf  hostname  hosts  hosts.allow  hosts.deny  passwd  passwd- 
+	profile  protocols  resolv.conf  services  shadow  shadow-  ssl
+
+```
+
+ssl is a directory.
+
+in /lib/x86_64-linux-gnu
+
+```
+
+	libcap.so.2            libnss_compat.so.2  libnss_files-2.19.so   libnss_hesiod.so.2      libnss_nisplus.so.2  libresolv-2.19.so
+	libc.so.6              libnss_dns-2.19.so  libnss_files.so.2      libnss_nis-2.19.so      libnss_nis.so.2      libresolv.so.2
+	libnss_compat-2.19.so  libnss_dns.so.2     libnss_hesiod-2.19.so  libnss_nisplus-2.19.so  libpthread.so.0
+
+```
+
+you need all the libnss_ files.
 
