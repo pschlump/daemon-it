@@ -307,5 +307,13 @@ in /lib/x86_64-linux-gnu
 
 ```
 
-you need all the libnss_ files.
+you need all the files that start with libnss.
+
+In /usr/share you need:
+
+```
+
+	ca-certificates
+
+```
 
