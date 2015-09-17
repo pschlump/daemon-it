@@ -2,11 +2,10 @@
 // D A E M O N - I T - run a Go program (or other program) as a daemon.
 //
 // Copyright (C) Philip Schlump, 1996-2015.
-// Version: 1.0.0
-// BuildNo: 025
+// Version: 1.0.1
+// BuildNo: 026
 //
 // Licensed under the terms of the MIT license. 
-// Whitchever one is more convenient for the user.
 //
 // License in LICENSE
 // How to use in README.md
@@ -20,7 +19,9 @@
 #include <fcntl.h>
 #include <pwd.h>
 #include <grp.h>
-
+#include <sys/resource.h>
+#include <errno.h>
+#include <string.h>
 
 //
 // Notes: -- Not implemented yet
@@ -43,11 +44,13 @@ int main(int argc, char** argv) {
 	char *stdin_fn = "";
 	char *pid_fn = "";
 	int cmd_start = 1;
+	int ulimit_set = 0;		// false - do not set ulimit up.
 	int i, j, c;
 	char *s;
 	FILE *pid_fp = NULL;
 	uid_t uid;
 	gid_t gid;
+	struct rlimit limit;
 
 	for ( i = 1; i < argc; i++ ) {
 		s = argv[i];
@@ -87,6 +90,9 @@ int main(int argc, char** argv) {
 			case 'i':
 				stdin_fn = argv[++i];
 				break;
+			case 'U':
+				ulimit_set = 1;	// Max it out
+				break;
 			// case 'E':
 			case '-':
 				cmd_start = ++i;
@@ -105,6 +111,27 @@ done:;
     }
 
 	// Processing before chroot - all things that require the full OS and file system
+
+	// Setting ulimit at this point
+	if ( ulimit_set ) {
+		limit.rlim_cur = 65535;
+		limit.rlim_max = 65535;
+		if (setrlimit(RLIMIT_NOFILE, &limit) != 0) {
+			fprintf(stderr,"setrlimit() failed with errno=%d\n", errno);
+			exit(1);
+		}
+
+		/* Get max number of files. */
+		if (getrlimit(RLIMIT_NOFILE, &limit) != 0) {
+			fprintf(stderr,"getrlimit() failed with errno=%d\n", errno);
+			exit(1);
+		}
+
+		if ( debug ) {
+			printf("The soft limit is %llu\n", limit.rlim_cur);
+			printf("The hard limit is %llu\n", limit.rlim_max);
+		}
+	}
 
 	if ( strcmp ( pid_fn, "" ) != 0 ) {
 		if ( ( pid_fp = fopen ( pid_fn, "w" ) ) == NULL ) {
@@ -273,6 +300,7 @@ void usage(void) {
 	fprintf ( stderr, "  -i <fn>            Point stdin at a file or '-' for passing stdout through.\n" );
 	fprintf ( stderr, "  -O <fn>            Point stderr at a file or '-' for passing stdout through, '&1' to dup stdout.\n" );
 	fprintf ( stderr, "  -E name=val        Set environment, not implemented yet\n" );
+	fprintf ( stderr, "  -U                 Set ulimit to maximum\n" );
 
 
 	exit(1);
