@@ -1,4 +1,4 @@
-# daemon-it - a C program to start Go server as a chroot daemon
+# daemon-it - a C program to start Go (golang) server as a chroot jailed daemon
 
 Go has some challenges with Linux and setting UID across all
 threads.  For this reason I had to dig up this old chunk of
@@ -9,6 +9,9 @@ Basically this program will use some command line options
 to set up a chroot jail, change users and groups to a non-root
 account, deal with stdin/stdout/stderr so as to create
 a daemon.
+
+This also works very nicely for running stuff other than
+Go as well.
 
 ## Example
 
