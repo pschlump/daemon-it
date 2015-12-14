@@ -250,6 +250,7 @@ void stdIOfiles(char *stdout_fn, char *stderr_fn, char *stdin_fn) {
 		// --------- stdout ----------------------------------------------------------------------------------------------
 		if ( strcmp ( stdout_fn, "-" ) == 0 ) {			// if a "-" for stdout, then just let it clone to forked child
 		} else if ( strcmp ( stdout_fn, "" ) != 0 ) {	// if it is a file name, we will need to open it.
+// xyzzy - file not opened correctly - will start at top instead of append!
 			if ((fo = open(stdout_fn, O_WRONLY|O_CREAT, 0764)) != -1) {
 				(void)dup2(fo, STDOUT_FILENO);
 			} else if ((fo = open(stdout_fn, O_RDWR|O_APPEND, 0764)) != -1) {
@@ -270,6 +271,7 @@ void stdIOfiles(char *stdout_fn, char *stderr_fn, char *stdin_fn) {
 			}
 		} else if ( strcmp ( stderr_fn, "-" ) == 0 ) {	// if a "-" for stderr, then just let it clone to forked child
 		} else if ( strcmp ( stderr_fn, "" ) != 0 ) {	// if it is a file name, we will need to open it.
+// xyzzy - file not opened correctly - will start at top instead of append!
 			if ((fe = open(stderr_fn, O_WRONLY|O_CREAT, 0764)) != -1) {
 				(void)dup2(fe, STDERR_FILENO);
 			} else if ((fe = open(stderr_fn, O_RDWR|O_APPEND, 0764)) != -1) {

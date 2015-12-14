@@ -36,7 +36,7 @@ start() {
         rm -f "$PIDFILE"
 	#echo CC $DAEMON_IT -R "$JAIL" -c "$RUN_DIR" -u "$DAEMON_USER" -g "$DAEMON_GROUP" -o log/output.log -O - -p "$PIDFILE" \
 	#			-- $DAEMON $DAEMON_ARGS &
-        $DAEMON_IT -R "$JAIL" -c "$RUN_DIR" -u "$DAEMON_USER" -g "$DAEMON_GROUP" -o log/output.log -O - -p "$PIDFILE" \
+        $DAEMON_IT -R "$JAIL" -c "$RUN_DIR" -u "$DAEMON_USER" -g "$DAEMON_GROUP" -o log/output.$$.og -O - -p "$PIDFILE" \
 			-- $DAEMON $DAEMON_ARGS &
         RETVAL="$?"
         return "$RETVAL"
